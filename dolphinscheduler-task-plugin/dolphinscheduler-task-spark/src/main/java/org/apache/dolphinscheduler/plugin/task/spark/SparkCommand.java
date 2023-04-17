@@ -25,8 +25,8 @@ public enum SparkCommand {
      * 2 SPARK1SQL
      * 3 SPARK2SQL
      */
-    SPARK1SUBMIT(0, "SPARK1SUBMIT", "${SPARK_HOME1}/bin/spark-submit", SparkVersion.SPARK1),
-    SPARK2SUBMIT(1, "SPARK2SUBMIT", "${SPARK_HOME2}/bin/spark-submit", SparkVersion.SPARK2),
+    SPARK1SUBMIT(0, "SPARK1SUBMIT", "${SPARK_HOME1}/bin/spark2-submit", SparkVersion.SPARK1),
+    SPARK2SUBMIT(1, "SPARK2SUBMIT", "${SPARK_HOME2}/bin/spark2-submit", SparkVersion.SPARK2),
 
     SPARK1SQL(2, "SPARK1SQL", "${SPARK_HOME1}/bin/spark-sql", SparkVersion.SPARK1),
 
@@ -35,7 +35,7 @@ public enum SparkCommand {
     private final int code;
     private final String descp;
     /**
-     * usage: spark-submit [options] <app jar | python file> [app arguments]
+     * usage: spark2-submit [options] <app jar | python file> [app arguments]
      */
     private final String command;
     private final SparkVersion sparkVersion;

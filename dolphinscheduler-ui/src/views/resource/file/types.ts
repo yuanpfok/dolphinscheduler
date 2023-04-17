@@ -29,6 +29,9 @@ export interface ResourceFileTableData {
 export interface IEmit {
   (event: any, ...args: any[]): void
 }
+export interface IReUploadResource {
+  (id: number, name: string, description: string): void
+}
 
 export interface IRenameFile {
   (id: number, name: string, description: string): void

@@ -32,6 +32,7 @@ export default {
     operation: 'Operation',
     edit: 'Edit',
     rename: 'Rename',
+    re_upload: 'ReUpload',
     download: 'Download',
     delete: 'Delete',
     yes: 'Yes',

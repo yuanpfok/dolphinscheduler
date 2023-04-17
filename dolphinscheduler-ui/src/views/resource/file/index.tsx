@@ -49,6 +49,7 @@ import Card from '@/components/card'
 import ResourceFolderModal from './folder'
 import ResourceUploadModal from './upload'
 import ResourceRenameModal from './rename'
+import ResourceReuploadModal from './reupload'
 import styles from './index.module.scss'
 import type { ResourceFile } from '@/service/modules/resources/types'
 import type { Router } from 'vue-router'
@@ -63,6 +64,7 @@ export default defineComponent({
     const folderShowRef = ref(false)
     const uploadShowRef = ref(false)
     const renameShowRef = ref(false)
+    const reuploadShowRef = ref(false)
     const searchRef = ref()
 
     const renameInfo = reactive({
@@ -139,6 +141,13 @@ export default defineComponent({
       renameInfo.name = name
       renameInfo.description = description
       handleShowModal(renameShowRef)
+    }
+
+    const handleReUploadResource: IRenameFile = (id, name, description) => {
+      renameInfo.id = id
+      renameInfo.name = name
+      renameInfo.description = description
+      handleShowModal(reuploadShowRef)
     }
 
     const handleGoRoot = () => {
@@ -231,6 +240,7 @@ export default defineComponent({
       folderShowRef,
       uploadShowRef,
       renameShowRef,
+      reuploadShowRef,
       handleShowModal,
       resourceListRef,
       updateList,
@@ -239,6 +249,7 @@ export default defineComponent({
       handleCreateFile,
       handleUploadFile,
       handleRenameFile,
+      handleReUploadResource,
       handleUpdatePage,
       handleUpdatePageSize,
       handleGoRoot,
@@ -252,6 +263,7 @@ export default defineComponent({
     const { t } = useI18n()
     const { columnsRef, tableWidth } = useTable(
       this.handleRenameFile,
+      this.handleReUploadResource,
       this.updateList
     )
     const {
@@ -357,6 +369,13 @@ export default defineComponent({
           name={this.renameInfo.name}
           description={this.renameInfo.description}
           onUpdateList={this.updateList}
+        />
+        <ResourceReuploadModal
+            v-model:show={this.reuploadShowRef}
+            id={this.renameInfo.id}
+            name={this.renameInfo.name}
+            description={this.renameInfo.description}
+            onUpdateList={this.updateList}
         />
       </NSpace>
     )

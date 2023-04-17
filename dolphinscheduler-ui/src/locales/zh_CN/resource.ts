@@ -32,6 +32,7 @@ export default {
     operation: '操作',
     edit: '编辑',
     rename: '重命名',
+    re_upload: '重新上传',
     download: '下载',
     delete: '删除',
     yes: '是',
