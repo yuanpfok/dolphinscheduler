@@ -51,8 +51,9 @@ export function useReUpload(state: any) {
       await updateResource(
           {
             id: state.uploadForm.id,
-            name: state.uploadForm.name,
             type: 'FILE',
+            name: state.uploadForm.name,
+            description:state.uploadForm.description,
             ...formData as any
           },
           state.uploadForm.id

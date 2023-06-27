@@ -122,7 +122,7 @@ export default defineComponent({
         </NTooltip>
         <NTooltip trigger={'hover'}>
           {{
-            default: () => t('resource.file.reupload'),
+            default: () => t('resource.file.re_upload'),
             trigger: () => (
               <NButton
                 size='tiny'
