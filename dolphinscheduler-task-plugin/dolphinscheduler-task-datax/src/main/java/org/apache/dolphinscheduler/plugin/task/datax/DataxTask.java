@@ -17,18 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.datax;
 
-import com.alibaba.druid.sql.ast.SQLStatement;
-import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
-import com.alibaba.druid.sql.ast.expr.SQLPropertyExpr;
-import com.alibaba.druid.sql.ast.statement.SQLSelect;
-import com.alibaba.druid.sql.ast.statement.SQLSelectItem;
-import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
-import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
-import com.alibaba.druid.sql.ast.statement.SQLUnionQuery;
-import com.alibaba.druid.sql.parser.SQLStatementParser;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import static org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils.decodePassword;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
@@ -39,7 +27,6 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -78,7 +65,20 @@ import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.alibaba.druid.sql.ast.SQLStatement;
+import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
+import com.alibaba.druid.sql.ast.expr.SQLPropertyExpr;
+import com.alibaba.druid.sql.ast.statement.SQLSelect;
+import com.alibaba.druid.sql.ast.statement.SQLSelectItem;
+import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
+import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
+import com.alibaba.druid.sql.ast.statement.SQLUnionQuery;
+import com.alibaba.druid.sql.parser.SQLStatementParser;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 public class DataxTask extends AbstractTask {
+
     /**
      * jvm parameters
      */
@@ -88,7 +88,7 @@ public class DataxTask extends AbstractTask {
     /**
      * python process(datax only supports version 2.7 by default)
      */
-    private static final String DATAX_PYTHON = "python2.7";
+    private static final String DATAX_PYTHON = "python";
     private static final Pattern PYTHON_PATH_PATTERN = Pattern.compile("/bin/python[\\d.]*$");
     /**
      * datax path
@@ -141,7 +141,8 @@ public class DataxTask extends AbstractTask {
             throw new RuntimeException("datax task params is not valid");
         }
 
-        dataxTaskExecutionContext = dataXParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
+        dataxTaskExecutionContext =
+                dataXParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
     }
 
     /**
@@ -195,8 +196,7 @@ public class DataxTask extends AbstractTask {
      * @return datax json file name
      * @throws Exception if error throws Exception
      */
-    private String buildDataxJsonFile(Map<String, Property> paramsMap)
-            throws Exception {
+    private String buildDataxJsonFile(Map<String, Property> paramsMap) throws Exception {
         // generate json
         String fileName = String.format("%s/%s_job.json",
                 taskExecutionContext.getExecutePath(),
@@ -273,7 +273,8 @@ public class DataxTask extends AbstractTask {
         ArrayNode tableArr = writerConn.putArray("table");
         tableArr.add(dataXParameters.getTargetTable());
 
-        writerConn.put("jdbcUrl", DataSourceUtils.getJdbcUrl(DbType.valueOf(dataXParameters.getDtType()), dataTargetCfg));
+        writerConn.put("jdbcUrl",
+                DataSourceUtils.getJdbcUrl(DbType.valueOf(dataXParameters.getDtType()), dataTargetCfg));
         writerConnArr.add(writerConn);
 
         ObjectNode writerParam = JSONUtils.createObjectNode();
@@ -379,8 +380,7 @@ public class DataxTask extends AbstractTask {
      * @return shell command file name
      * @throws Exception if error throws Exception
      */
-    private String buildShellCommandFile(String jobConfigFilePath, Map<String, Property> paramsMap)
-            throws Exception {
+    private String buildShellCommandFile(String jobConfigFilePath, Map<String, Property> paramsMap) throws Exception {
         // generate scripts
         String fileName = String.format("%s/%s_node.%s",
                 taskExecutionContext.getExecutePath(),
@@ -468,7 +468,8 @@ public class DataxTask extends AbstractTask {
      * @param sql sql for data synchronization
      * @return Keyword converted column names
      */
-    private String[] parsingSqlColumnNames(DbType sourceType, DbType targetType, BaseConnectionParam dataSourceCfg, String sql) {
+    private String[] parsingSqlColumnNames(DbType sourceType, DbType targetType, BaseConnectionParam dataSourceCfg,
+                                           String sql) {
         String[] columnNames = tryGrammaticalAnalysisSqlColumnNames(sourceType, sql);
 
         if (columnNames == null || columnNames.length == 0) {
@@ -565,7 +566,8 @@ public class DataxTask extends AbstractTask {
         sql = sql.replace(";", "");
 
         try (
-                Connection connection = DataSourceClientProvider.getInstance().getConnection(sourceType, baseDataSource);
+                Connection connection =
+                        DataSourceClientProvider.getInstance().getConnection(sourceType, baseDataSource);
                 PreparedStatement stmt = connection.prepareStatement(sql);
                 ResultSet resultSet = stmt.executeQuery()) {
 
@@ -573,7 +575,7 @@ public class DataxTask extends AbstractTask {
             int num = md.getColumnCount();
             columnNames = new String[num];
             for (int i = 1; i <= num; i++) {
-                columnNames[i - 1] = md.getColumnName(i).replace("t.","");
+                columnNames[i - 1] = md.getColumnName(i).replace("t.", "");
             }
         } catch (SQLException | ExecutionException e) {
             logger.error(e.getMessage(), e);

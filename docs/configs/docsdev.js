@@ -447,15 +447,15 @@ export default {
                 children: [
                     {
                         title: 'Open API',
-                        link: '/en-us/docs/3.1.7/user_doc/guide/api/open-api.html',
+                        link: '/en-us/docs/3.1.5/user_doc/guide/open-api.html',
                     },
                     {
                         title: 'PyDolphinScheduler',
-                        link: '/en-us/docs/3.1.7/user_doc/guide/api/pydolphinscheduler.html',
+                        link: '/python/main/index.html',
                     },
                     {
                         title: 'Health Check',
-                        link: '/en-us/docs/3.1.7/user_doc/guide/api/healthcheck.html',
+                        link: '/en-us/docs/3.1.5/user_doc/guide/healthcheck.html',
                     },
                 ],
             },
@@ -1055,15 +1055,15 @@ export default {
                 children: [
                     {
                         title: 'API调用',
-                        link: '/zh-cn/docs/3.1.7/user_doc/guide/api/open-api.html',
+                        link: '/zh-cn/docs/3.1.5/user_doc/guide/open-api.html',
                     },
                     {
                         title: 'PyDolphinScheduler',
-                        link: '/zh-cn/docs/3.1.7/user_doc/guide/api/pydolphinscheduler.html',
+                        link: '/python/main/index.html',
                     },
                     {
                         title: '健康检查',
-                        link: '/zh-cn/docs/3.1.7/user_doc/guide/api/healthcheck.html',
+                        link: '/zh-cn/docs/3.1.5/user_doc/guide/healthcheck.html',
                     },
                 ],
             },

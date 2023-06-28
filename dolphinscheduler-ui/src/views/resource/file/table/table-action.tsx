@@ -23,14 +23,15 @@ import {
   DownloadOutlined,
   FormOutlined,
   EditOutlined,
-  InfoCircleFilled
+  InfoCircleFilled,
+  UploadOutlined
 } from '@vicons/antd'
 import _ from 'lodash'
 import { useI18n } from 'vue-i18n'
 import { ResourceFileTableData } from '../types'
 import { fileTypeArr } from '@/common/common'
 import { downloadResource, deleteResource } from '@/service/modules/resources'
-import { IRenameFile, IRtDisb } from '../types'
+import { IRenameFile, IRtDisb, IReUploadResource } from '../types'
 import type { Router } from 'vue-router'
 
 const props = {
@@ -51,7 +52,7 @@ const props = {
 export default defineComponent({
   name: 'TableAction',
   props,
-  emits: ['updateList', 'renameResource'],
+  emits: ['updateList', 'renameResource', 'reUploadResource'],
   setup(props, { emit }) {
     const { t } = useI18n()
     const router: Router = useRouter()
@@ -74,6 +75,13 @@ export default defineComponent({
     const handleRenameFile: IRenameFile = (id, name, description) => {
       emit('renameResource', id, name, description)
     }
+    const handleReUploadResource: IReUploadResource = (
+      id,
+      name,
+      description
+    ) => {
+      emit('reUploadResource', id, name, description)
+    }
 
     return {
       t,
@@ -81,6 +89,7 @@ export default defineComponent({
       handleEditFile,
       handleDeleteFile,
       handleRenameFile,
+      handleReUploadResource,
       ...props
     }
   },
@@ -106,6 +115,32 @@ export default defineComponent({
               >
                 <NIcon>
                   <FormOutlined />
+                </NIcon>
+              </NButton>
+            )
+          }}
+        </NTooltip>
+        <NTooltip trigger={'hover'}>
+          {{
+            default: () => t('resource.file.re_upload'),
+            trigger: () => (
+              <NButton
+                size='tiny'
+                type='info'
+                onClick={() =>
+                  this.handleReUploadResource(
+                    this.row.id,
+                    this.row.name,
+                    this.row.description
+                  )
+                }
+                disabled={!!this.row?.directory}
+                style={{ marginRight: '-5px' }}
+                circle
+                class='btn-reupload'
+              >
+                <NIcon>
+                  <UploadOutlined />
                 </NIcon>
               </NButton>
             )

@@ -15,24 +15,25 @@
  * limitations under the License.
  */
 
-import { axios } from '@/service/service'
+import {axios} from '@/service/service'
 import utils from '@/utils'
 import {
-  ResourceTypeReq,
-  NameReq,
+  ContentReq,
+  CreateReq,
+  DescriptionReq,
   FileNameReq,
   FullNameReq,
   IdReq,
-  ContentReq,
-  DescriptionReq,
-  CreateReq,
-  UserIdReq,
+  ListReq,
+  NameReq,
   OnlineCreateReq,
   ProgramTypeReq,
-  ListReq,
-  ViewResourceReq,
   ResourceIdReq,
-  UdfFuncReq
+  ResourceTypeReq,
+  UdfFuncReq,
+  UserIdReq,
+  ViewResourceReq,
+  ResourceFile
 } from './types'
 
 export function queryResourceListPaging(
@@ -194,7 +195,7 @@ export function queryResource(
 }
 
 export function updateResource(
-  data: NameReq & ResourceTypeReq & IdReq & DescriptionReq,
+  data: IdReq & ResourceTypeReq  & NameReq & DescriptionReq & ResourceFile,
   id: number
 ): any {
   return axios({

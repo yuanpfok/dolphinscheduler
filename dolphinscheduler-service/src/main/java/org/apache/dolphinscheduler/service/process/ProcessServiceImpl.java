@@ -32,8 +32,6 @@ import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR
 import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TASK_INSTANCE_ID;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.constants.CommandKeyConstants;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
@@ -147,6 +145,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -162,6 +162,22 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import javax.annotation.Nullable;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import io.micrometer.core.annotation.Counted;
 
 /**
  * process relative dao that some mappers in this.
@@ -938,9 +954,8 @@ public class ProcessServiceImpl implements ProcessService {
         }
         if (cmdParam != null) {
             CommandType commandTypeIfComplement = getCommandTypeIfComplement(processInstance, command);
-            // reset global params while repeat running and recover tolerance fault process is needed by cmdParam
-            if (commandTypeIfComplement == CommandType.REPEAT_RUNNING ||
-                    commandTypeIfComplement == CommandType.RECOVER_TOLERANCE_FAULT_PROCESS) {
+            // reset global params while repeat running is needed by cmdParam
+            if (commandTypeIfComplement == CommandType.REPEAT_RUNNING) {
                 setGlobalParamIfCommanded(processDefinition, cmdParam);
             }
 
@@ -1773,7 +1788,9 @@ public class ProcessServiceImpl implements ProcessService {
                         JSONUtils.toJsonString(mainJarObj),
                         ResourceInfo.class);
                 ResourceInfo resourceInfo = updateResourceInfo(mainJar);
-                taskParameters.put("mainJar", resourceInfo);
+                if (resourceInfo != null) {
+                    taskParameters.put("mainJar", resourceInfo);
+                }
             }
             // update resourceList information
             if (taskParameters.containsKey("resourceList")) {
@@ -1809,8 +1826,8 @@ public class ProcessServiceImpl implements ProcessService {
             resourceInfo = new ResourceInfo();
             // get resource from database, only one resource should be returned
             Resource resource = getResourceById(resourceId);
-            if (Objects.isNull(resource)) {
-                logger.error("resource not found, resourceId: {}", resourceId);
+            if (resource == null) {
+                logger.error("invalid resourceId, {},resource {}", resourceId, resource);
                 return null;
             }
             resourceInfo.setId(resourceId);
@@ -2082,7 +2099,8 @@ public class ProcessServiceImpl implements ProcessService {
         cmd.setProcessDefinitionCode(processDefinition.getCode());
         cmd.setProcessDefinitionVersion(processDefinition.getVersion());
         cmd.setProcessInstanceId(processInstance.getId());
-        cmd.setCommandParam(JSONUtils.toJsonString(createCommandParams(processInstance)));
+        cmd.setCommandParam(
+                String.format("{\"%s\":%d}", CMD_PARAM_RECOVER_PROCESS_ID_STRING, processInstance.getId()));
         cmd.setExecutorId(processInstance.getExecutorId());
         cmd.setCommandType(CommandType.RECOVER_TOLERANCE_FAULT_PROCESS);
         cmd.setProcessInstancePriority(processInstance.getProcessInstancePriority());
@@ -3201,16 +3219,5 @@ public class ProcessServiceImpl implements ProcessService {
                 }
             }
         }
-    }
-
-    private Map<String, Object> createCommandParams(ProcessInstance processInstance) {
-        Map<String, Object> commandMap =
-                JSONUtils.parseObject(processInstance.getCommandParam(), new TypeReference<Map<String, Object>>() {
-                });
-        Map<String, Object> recoverFailoverCommandParams = new HashMap<>();
-        Optional.ofNullable(MapUtils.getObject(commandMap, CMD_PARAM_START_PARAMS))
-                .ifPresent(startParams -> recoverFailoverCommandParams.put(CMD_PARAM_START_PARAMS, startParams));
-        recoverFailoverCommandParams.put(CMD_PARAM_RECOVER_PROCESS_ID_STRING, processInstance.getId());
-        return recoverFailoverCommandParams;
     }
 }
