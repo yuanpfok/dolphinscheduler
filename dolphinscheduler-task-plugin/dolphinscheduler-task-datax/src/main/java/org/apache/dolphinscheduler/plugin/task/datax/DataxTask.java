@@ -22,7 +22,6 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
@@ -61,7 +60,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -88,7 +86,7 @@ public class DataxTask extends AbstractTask {
     /**
      * python process(datax only supports version 2.7 by default)
      */
-    private static final String DATAX_PYTHON = "python";
+    private static final String DATAX_PYTHON = "python2.7";
     private static final Pattern PYTHON_PATH_PATTERN = Pattern.compile("/bin/python[\\d.]*$");
     /**
      * datax path
@@ -566,8 +564,7 @@ public class DataxTask extends AbstractTask {
         sql = sql.replace(";", "");
 
         try (
-                Connection connection =
-                        DataSourceClientProvider.getInstance().getConnection(sourceType, baseDataSource);
+                Connection connection = DataSourceUtils.getConnection(sourceType, baseDataSource);
                 PreparedStatement stmt = connection.prepareStatement(sql);
                 ResultSet resultSet = stmt.executeQuery()) {
 
@@ -577,7 +574,7 @@ public class DataxTask extends AbstractTask {
             for (int i = 1; i <= num; i++) {
                 columnNames[i - 1] = md.getColumnName(i).replace("t.", "");
             }
-        } catch (SQLException | ExecutionException e) {
+        } catch (SQLException e) {
             logger.error(e.getMessage(), e);
             return null;
         }
