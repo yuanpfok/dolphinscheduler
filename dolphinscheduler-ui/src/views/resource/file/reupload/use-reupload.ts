@@ -41,21 +41,15 @@ export function useReUpload(state: any) {
       const currentDir = fileStore.getCurrentDir || '/'
       const formData = new FormData()
       formData.append('id', state.uploadForm.id)
-      formData.append('file', state.uploadForm.file)
       formData.append('type', 'FILE')
       formData.append('name', state.uploadForm.name)
+      formData.append('description', state.uploadForm.description)
+      formData.append('file', state.uploadForm.file)
       formData.append('pid', String(pid))
       formData.append('currentDir', currentDir)
-      formData.append('description', state.uploadForm.description)
 
       await updateResource(
-          {
-            id: state.uploadForm.id,
-            type: 'FILE',
-            name: state.uploadForm.name,
-            description:state.uploadForm.description,
-            ...formData as any
-          },
+          formData as any,
           state.uploadForm.id
       )
       window.$message.success(t('resource.file.success'))
